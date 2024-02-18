@@ -6,11 +6,5 @@ export class User {
   _id: ObjectId;
 
   @Column()
-  firstName: string;
-
-  @Column()
-  lastName: string;
-
-  @Column()
-  typeAccount: string;
+  userName: string;
 }

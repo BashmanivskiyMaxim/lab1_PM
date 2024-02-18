@@ -9,14 +9,18 @@ import {
   Put,
 } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
-import { FormEntity } from './form.entity';
+import { Form as FormEntity } from './form.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Controller('form')
 export class FormController {
-  constructor(private readonly formRepository: MongoRepository<FormEntity>) {}
+  constructor(
+    @InjectRepository(FormEntity)
+    private readonly formRepository: MongoRepository<FormEntity>,
+  ) {}
   @Post()
   create(@Body() form: Partial<FormEntity>) {
-    return this.formRepository.create(form);
+    return this.formRepository.save(form);
   }
   @Get()
   findAll() {

@@ -1,13 +1,10 @@
 import { Entity, ObjectId, ObjectIdColumn, Column } from 'typeorm';
 
 @Entity()
-export class FormEntity {
+export class Form {
   @ObjectIdColumn()
   _id: ObjectId;
 
-  @Column()
-  Info: string;
-
-  @Column()
-  Info2: string;
+  @Column({ type: 'json' })
+  data: any;
 }

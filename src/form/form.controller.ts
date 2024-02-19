@@ -42,4 +42,17 @@ export class FormController {
   remove(@Param('id') id: string) {
     return this.formRepository.delete(id);
   }
+  // @Get(':id/pdf')
+  // public async generatePDF(
+  //   @Param('id') id: string,
+  //   @Res() res: Response,
+  // ): Promise<void> {
+  //   const form = await this.formRepository.findOne({ where: { id } });
+  //   if (!form) {
+  //     throw new NotFoundException();
+  //   }
+  //   const pdfStream = generatePDF(form);
+  //   res.setHeader('Content-Type', 'application/pdf');
+  //   pdfStream.pipe(res);
+  // }
 }

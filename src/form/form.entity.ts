@@ -7,4 +7,7 @@ export class Form {
 
   @Column({ type: 'json' })
   data: any;
+
+  @Column({ type: 'timestamp' })
+  createdAt: Date;
 }

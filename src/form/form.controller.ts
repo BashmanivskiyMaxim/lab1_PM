@@ -8,11 +8,14 @@ import {
   Param,
   Post,
   Put,
+  Res,
 } from '@nestjs/common';
 import { MongoRepository } from 'typeorm';
 import { Form as FormEntity } from './form.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectId } from 'mongodb';
+import { generatePDF } from './generatePDF';
+import { Response } from 'express';
 
 @Controller('form')
 export class FormController {
@@ -55,5 +58,31 @@ export class FormController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.formRepository.delete(id);
+  }
+  @Get(':id/pdf')
+  public async generatePDF(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<void> {
+    try {
+      const form = await this.formRepository.findOne({
+        // @ts-expect-error
+        _id: new ObjectId(id),
+      });
+      if (!form) {
+        throw new NotFoundException();
+      }
+      const pdfBuffer = await generatePDF(form);
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment; filename=form_${id}.pdf`,
+        'Content-Length': pdfBuffer.length,
+      });
+
+      res.end(pdfBuffer);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      res.status(500).send('Error generating PDF');
+    }
   }
 }

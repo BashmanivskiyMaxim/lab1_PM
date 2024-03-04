@@ -1,16 +1,22 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 import { Form } from './form.entity';
-import fetch from 'node-fetch';
+//import fetch from 'node-fetch';
 import * as fontkit from '@pdf-lib/fontkit';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export async function generatePDF(formData: Form): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage();
   const { data } = formData;
 
-  const url =
-    'https://db.onlinewebfonts.com/t/643e59524d730ce6c6f2384eebf945f8.ttf';
-  const fontBytes = await fetch(url).then((res) => res.arrayBuffer());
+  // const url =
+  //   'https://db.onlinewebfonts.com/t/643e59524d730ce6c6f2384eebf945f8.ttf';
+  // const fontBytes = await fetch(url).then((res) => res.arrayBuffer());
+  // console.log('fontBytes', fontBytes);
+
+  const fontPath = path.join(__dirname, '..', 'assets', 'font.ttf');
+  const fontBytes = fs.readFileSync(fontPath);
 
   pdfDoc.registerFontkit(fontkit);
   const customFont = await pdfDoc.embedFont(fontBytes);

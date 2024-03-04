@@ -1,5 +1,6 @@
 import { PDFDocument, rgb } from 'pdf-lib';
 import { Form } from './form.entity';
+import fetch from 'node-fetch';
 import * as fontkit from '@pdf-lib/fontkit';
 
 export async function generatePDF(formData: Form): Promise<Uint8Array> {
@@ -19,7 +20,7 @@ export async function generatePDF(formData: Form): Promise<Uint8Array> {
   page.drawText('Бриф на розробку сайту', {
     x: 50,
     y: yPosition,
-    size: 28,
+    size: 16,
     font: customFont,
     color: rgb(0, 0, 0),
   });
@@ -44,19 +45,44 @@ export async function generatePDF(formData: Form): Promise<Uint8Array> {
         yPosition -= 95;
       });
     } else {
-      const options = {
-        x: 50,
-        y: yPosition,
-        size: 12,
-        font: customFont,
-        color: rgb(0, 0, 0),
-        maxWidth: 500,
-        wrap: true,
-      };
-      page.drawText(`${fieldName}: ${fieldValue}`, options);
-      yPosition -= 30;
+      const text = `${fieldName}: ${fieldValue}`;
+      const lines = breakText(text, customFont, 12, 500);
+      lines.forEach((line, lineIndex) => {
+        page.drawText(line, {
+          x: 50,
+          y: yPosition - lineIndex * 12,
+          size: 12,
+          font: customFont,
+          color: rgb(0, 0, 0),
+        });
+      });
+      yPosition -= (lines.length + 1) * 12; // Extra space after each line
     }
   });
 
   return pdfDoc.save();
+}
+
+function breakText(
+  text: string,
+  font: any,
+  fontSize: number,
+  maxWidth: number,
+): string[] {
+  const lines: string[] = [];
+  let currentLine = '';
+  const words = text.split(' ');
+  for (const word of words) {
+    //const width = font.widthOfTextAtSize(word, fontSize);
+    if (
+      font.widthOfTextAtSize(currentLine + ' ' + word, fontSize) <= maxWidth
+    ) {
+      currentLine += (currentLine ? ' ' : '') + word;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
 }
